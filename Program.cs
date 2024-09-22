@@ -1,4 +1,4 @@
-namespace _10mbfy
+namespace webpfy
 {
     internal static class Program
     {
@@ -8,10 +8,19 @@ namespace _10mbfy
         [STAThread]
         static void Main()
         {
+            try
+            {
+                if (!Directory.Exists(Core.outputDir))
+                {
+                    Directory.CreateDirectory(Core.outputDir);
+                }
+            }catch (Exception e) {
+                MessageBox.Show(e.Message);
+            }
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(new MainForm());
         }
     }
 }
