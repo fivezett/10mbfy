@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             progressBar1 = new ProgressBar();
             convertByClipBoard = new Button();
             forceFrontCheckBox = new CheckBox();
-            openSettingsButton = new Button();
             openOutputDir = new Button();
             copyButton = new Button();
             SuspendLayout();
@@ -66,19 +66,9 @@
             forceFrontCheckBox.UseVisualStyleBackColor = true;
             forceFrontCheckBox.CheckedChanged += forceFrontCheckBox_CheckedChanged;
             // 
-            // openSettingsButton
-            // 
-            openSettingsButton.Location = new Point(297, 241);
-            openSettingsButton.Name = "openSettingsButton";
-            openSettingsButton.Size = new Size(41, 49);
-            openSettingsButton.TabIndex = 3;
-            openSettingsButton.Text = "⚙";
-            openSettingsButton.UseVisualStyleBackColor = true;
-            openSettingsButton.Click += openSettingsButton_Click;
-            // 
             // openOutputDir
             // 
-            openOutputDir.Location = new Point(250, 241);
+            openOutputDir.Location = new Point(289, 241);
             openOutputDir.Name = "openOutputDir";
             openOutputDir.Size = new Size(41, 49);
             openOutputDir.TabIndex = 4;
@@ -88,6 +78,7 @@
             // 
             // copyButton
             // 
+            copyButton.Enabled = false;
             copyButton.Location = new Point(0, 296);
             copyButton.Name = "copyButton";
             copyButton.Size = new Size(338, 46);
@@ -98,21 +89,24 @@
             // 
             // MainForm
             // 
+            AllowDrop = true;
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(342, 343);
             Controls.Add(copyButton);
             Controls.Add(openOutputDir);
-            Controls.Add(openSettingsButton);
             Controls.Add(forceFrontCheckBox);
             Controls.Add(convertByClipBoard);
             Controls.Add(progressBar1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "MainForm";
             Text = "webpfy";
             Load += MainForm_Load;
+            DragDrop += MainForm_DragDrop;
+            DragEnter += MainForm_DragEnter;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -122,7 +116,6 @@
         private ProgressBar progressBar1;
         private Button convertByClipBoard;
         private CheckBox forceFrontCheckBox;
-        private Button openSettingsButton;
         private Button openOutputDir;
         private Button copyButton;
     }

@@ -7,25 +7,27 @@ namespace webpfy
     {
         public event Action<int, int> ProgressEventHandler;
 
-        public WebpEncoder Encoder = new WebpEncoder()
+        public WebpEncoder Encoder = new WebpEncoder
         {
-            NearLossless = false
+            FileFormat = WebpFileFormatType.Lossy,
+            Quality = 100
         };
 
         public static string outputDir
         {
             get
             {
-                return AppDomain.CurrentDomain.BaseDirectory + "output";
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output");
             }
         }
 
-        public async Task<string> ConvertToWebp(string[] paths)
+        public async Task<string> ConvertToWebp(string[] paths, CancellationToken token)
         {
             int cnt = 0;
             int total = paths.Length;
+            ProgressEventHandler?.Invoke(cnt, total);
 
-            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             string outputDateDir = Path.Combine(outputDir, timestamp);
             try
             {
@@ -73,18 +75,27 @@ namespace webpfy
             {
                 ParallelOptions parallelOptions = new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Math.Min(Environment.ProcessorCount, 4)
+                    MaxDegreeOfParallelism = Math.Max((int)Math.Ceiling(Environment.ProcessorCount * 0.8f), 1)
                 };
                 Parallel.ForEach(pathDict, parallelOptions, pathPair =>
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     using (Image<Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(pathPair.Key))
                     {
-                        image.SaveAsWebp(pathPair.Value + ".webp", Encoder);
+                        image.SaveAsWebpAsync(pathPair.Value + ".webp", Encoder, token).Wait();
                         ProgressEventHandler?.Invoke(++cnt, total);
                     }
                 });
             });
             GC.Collect();
+            if (token.IsCancellationRequested)
+            {
+                Directory.Delete(outputDateDir, true);
+                throw new TaskCanceledException();
+            }
             return outputDateDir;
         }
     }
